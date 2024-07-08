@@ -37,13 +37,6 @@ def create_app():
 
         db.create_all()
 
-        # Default setup - in case of deleted db use this (run the app before deploying those):
-        from utils.default_user import create_default_admin, create_default_users
-        from utils.default_books import create_default_books
-        create_default_admin()
-        create_default_users()
-        create_default_books()
-
     return app
 
 if __name__ == '__main__':
