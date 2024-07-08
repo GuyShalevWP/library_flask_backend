@@ -35,10 +35,19 @@ def create_app():
         app.register_blueprint(book_bp)
         app.register_blueprint(borrow_bp)
 
+        # Default setup - in case of deleted db use this (run the app before deploying those):
+        from utils.default_user import create_default_admin, create_default_users
+        from utils.default_books import create_default_books
+        create_default_admin()
+        create_default_users()
+        create_default_books()
+
         db.create_all()
 
     return app
 
+app = create_app()
+
+
 if __name__ == '__main__':
-    app = create_app()
     app.run(debug=True, port=7000)
