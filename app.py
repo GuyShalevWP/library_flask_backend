@@ -3,6 +3,7 @@ from flask_jwt_extended import JWTManager
 from flask_cors import CORS
 from flask_migrate import Migrate
 from config.config import Config
+from utils.ensure_upload_folder_exists import ensure_upload_folder_exists
 
 from models import db  # Import the single instance of db
 
