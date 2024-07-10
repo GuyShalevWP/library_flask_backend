@@ -33,26 +33,29 @@ def add_book():
     if int(return_type) not in [1, 2, 3]:
         return jsonify({'message': 'Invalid return type.'}), 400
     
-    if release_date is None or not re.match(r'^\d+$', release_date):
-        return jsonify({'message': 'Invalid release date. Enter year only'}), 400
+    if not re.match(r'^\d{4}$', release_date):
+        return jsonify({'message': 'Invalid release date. Enter year only (YYYY format)'}), 400
 
     # Check if a book with the same name and author already exists
     existing_book = Books.query.filter_by(name=name, author=author).first()
     if existing_book:
         return jsonify({'message': 'A book with the same name and author already exists.'}), 409
     
-    try:
-        filename = secure_filename(name + author + '.' + img_file.filename.rsplit('.', 1)[1].lower())
-        img_path = os.path.join(current_app.config['UPLOAD_FOLDER'], filename)
-        
-        # Open the image file
-        image = Image.open(img_file)
-        # Resize the image
-        image = image.resize((500, 500), Image.Resampling.LANCZOS)
-        # Save the image
-        image.save(img_path)
-    except Exception as e:
-        return jsonify({'message': 'Error saving image file', 'error': str(e)}), 500
+    # Default image path
+    img_path = 'default_image/default_book.png'
+    if img_file:
+        try:
+            filename = secure_filename(name + author + '.' + img_file.filename.rsplit('.', 1)[1].lower())
+            img_path = os.path.join(current_app.config['UPLOAD_FOLDER'], filename)
+            
+            # Open the image file
+            image = Image.open(img_file)
+            # Resize the image
+            image = image.resize((500, 500), Image.Resampling.LANCZOS)
+            # Save the image
+            image.save(img_path)
+        except Exception as e:
+            return jsonify({'message': 'Error saving image file', 'error': str(e)}), 500
 
     # Capitalize the first letter of each word in the author and name of the book
     name = name.title()
@@ -62,16 +65,19 @@ def add_book():
         name=name,
         author=author,
         release_date=release_date,
-        img=filename,
-        return_type=return_type,
+        img=img_path,
+        return_type=int(return_type),
         is_borrowed=False,
         is_available=True
     )
 
-    db.session.add(new_book)
-    db.session.commit()
-
-    return jsonify({'message': 'Book added successfully'}), 201
+    try:
+        db.session.add(new_book)
+        db.session.commit()
+        return jsonify({'message': 'Book added successfully'}), 201
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'message': 'Error adding book to the database', 'error': str(e)}), 500
 
 # Pathing uploaded image
 @book_bp.route('/assets/images/<path:filename>')

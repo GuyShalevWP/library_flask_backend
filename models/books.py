@@ -5,7 +5,7 @@ class Books(db.Model):
     name = db.Column(db.String(50), unique=True, nullable=False)
     author = db.Column(db.String(50), nullable=False)
     release_date = db.Column(db.String(20), nullable=False)
-    img = db.Column(db.String(100), nullable=True, default="default_image/default_book.png")
+    img = db.Column(db.String(100), nullable=True, default='default_image/default_book.png')
     return_type = db.Column(db.Integer, nullable=False) 
     is_borrowed = db.Column(db.Boolean, default=False, nullable=False)
     is_available = db.Column(db.Boolean, default=True, nullable=False)
