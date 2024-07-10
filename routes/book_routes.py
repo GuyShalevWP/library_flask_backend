@@ -42,7 +42,7 @@ def add_book():
         return jsonify({'message': 'A book with the same name and author already exists.'}), 409
     
     # Default image path
-    img_path = "/default_image/default_book.png"
+    img_path = "default_image/default_book.png"
     if img_file:
         try:
             filename = secure_filename(name + author + '.' + img_file.filename.rsplit('.', 1)[1].lower())
